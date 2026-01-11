@@ -144,10 +144,13 @@ class Scraper:
                 return []
         
         # Get all URLs from sitemap
+        # If max_articles is None (scrape all), we don't limit discovery
+        fetch_limit = max_articles * 3 if max_articles is not None else None
+        
         all_entries = list(self.sitemap_parser.get_all_urls(
             sitemap_url, 
             url_filter=url_filter,
-            max_urls=max_articles * 3  # Get extra to account for filtering
+            max_urls=fetch_limit
         ))
         
         # Filter valid URLs
@@ -156,7 +159,7 @@ class Scraper:
             is_valid, _ = self.url_validator.is_single_post(entry.url)
             if is_valid:
                 valid_urls.append(entry)
-                if len(valid_urls) >= max_articles:
+                if max_articles is not None and len(valid_urls) >= max_articles:
                     break
         
         print(f"[INFO] Found {len(valid_urls)} valid URLs to scrape")
