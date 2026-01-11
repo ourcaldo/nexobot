@@ -123,9 +123,10 @@ class Scraper:
                             base_url: str = "https://cetta.id",
                             url_filter: str = None,
                             max_articles: int = 10,
-                            delay: float = 1.0) -> List[ArticleContent]:
+                            delay: float = 1.0):
         """
         Scrape multiple articles from a sitemap.
+        Yields ArticleContent objects one by one.
         
         Args:
             sitemap_url: Direct URL to sitemap. If None, will try to discover.
@@ -134,14 +135,14 @@ class Scraper:
             max_articles: Maximum number of articles to scrape.
             delay: Delay between requests in seconds.
         
-        Returns:
-            List of ArticleContent objects
+        Yields:
+            ArticleContent objects
         """
         if not sitemap_url:
             sitemap_url = discover_sitemap(base_url)
             if not sitemap_url:
                 print(f"[ERROR] Could not find sitemap for {base_url}")
-                return []
+                return
         
         # Get all URLs from sitemap
         # If max_articles is None (scrape all), we don't limit discovery
@@ -164,16 +165,18 @@ class Scraper:
         
         print(f"[INFO] Found {len(valid_urls)} valid URLs to scrape")
         
-        articles = []
+        count = 0
         for i, entry in enumerate(valid_urls, 1):
             print(f"\n[{i}/{len(valid_urls)}] Processing: {entry.url}")
             
             article = self.scrape(entry.url, validate_url=False)
             if article:
-                articles.append(article)
+                yield article
+                count += 1
             
             if i < len(valid_urls):
                 time.sleep(delay)
         
-        print(f"\n[COMPLETE] Scraped {len(articles)} articles successfully")
-        return articles
+        print(f"\n[COMPLETE] Scraped {count} articles successfully")
+        
+
