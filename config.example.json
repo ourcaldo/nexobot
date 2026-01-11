@@ -1,0 +1,16 @@
+{
+    "output_format": "airtable",
+    "timeout": 60,
+    "prevent_duplicates": true,
+    "worker_mode": true,
+    "cycle_delay": 3600,
+    "airtable": {
+        "api_key": "YOUR_AIRTABLE_API_KEY",
+        "base_id": "YOUR_BASE_ID",
+        "table_id": "YOUR_TABLE_ID"
+    },
+    "urls": [
+        "https://example.com",
+        "https://blog.example.com/post"
+    ]
+}

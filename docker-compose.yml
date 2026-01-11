@@ -1,0 +1,8 @@
+services:
+  nexobot:
+    build: .
+    volumes:
+      - ./config.json:/app/config.json
+      - ./output:/app/output
+      - ./scraped_history.json:/app/scraped_history.json
+    command: ["--config", "config.json"]

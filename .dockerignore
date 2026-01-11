@@ -1,0 +1,20 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore output files
+output/
+*.json
+!config.json
+
+# Ignore history
+scraped_history.json
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore git
+.git/
+.gitignore
