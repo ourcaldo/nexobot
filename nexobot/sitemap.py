@@ -106,10 +106,27 @@ class SitemapParser:
         
         if self.is_sitemap_index(soup):
             print(f"[INFO] Found sitemap index with nested sitemaps")
-            for child_sitemap_url in self.parse_sitemap_index(soup):
+            child_sitemaps = self.parse_sitemap_index(soup)
+            
+            # Smart filtering: If we see sitemaps with "post" in the name, 
+            # we prioritize them and ignore others (like page, category, etc.)
+            post_sitemaps = [url for url in child_sitemaps if 'post' in url.lower().split('/')[-1]]
+            
+            target_sitemaps = post_sitemaps if post_sitemaps else child_sitemaps
+            
+            if post_sitemaps:
+                print(f"[INFO] Filtering for post sitemaps only ({len(post_sitemaps)} found)")
+            
+            for child_sitemap_url in target_sitemaps:
                 if max_urls and count >= max_urls:
                     break
                 
+                # Skip known non-content sitemaps if we didn't explicitly filter for posts
+                if not post_sitemaps:
+                    ignore_keywords = ['category', 'tag', 'author', 'user', 'page']
+                    if any(k in child_sitemap_url.lower() for k in ignore_keywords):
+                        continue
+
                 child_soup = self.fetch_sitemap(child_sitemap_url)
                 if child_soup:
                     for entry in self.parse_urlset(child_soup):
