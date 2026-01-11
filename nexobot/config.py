@@ -100,6 +100,19 @@ class HistoryManager:
         """Load scraped URL history from file."""
         if not os.path.exists(self.history_file):
             return
+            
+        # Fix for Docker mounting directory instead of file
+        if os.path.isdir(self.history_file):
+            try:
+                import shutil
+                print(f"[WARNING] History file is a directory. Removing and recreating as file.")
+                shutil.rmtree(self.history_file)
+                # Save empty history immediately to create the file
+                self._save_history()
+                return
+            except OSError as e:
+                print(f"[ERROR] Could not fix history directory: {e}")
+                return
         
         try:
             with open(self.history_file, 'r', encoding='utf-8') as f:
