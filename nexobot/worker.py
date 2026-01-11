@@ -81,8 +81,14 @@ class DomainWorker(threading.Thread):
                 print(f"[{self.name}] Skip (already scraped): {url}")
                 continue
             
-            # Check if root domain -> sitemap discovery
-            if self.scraper.url_validator.is_root_domain(url):
+            # Check logic:
+            # 1. Direct sitemap (.xml)
+            # 2. Root domain -> Discover sitemap
+            # 3. Regular article URL
+            
+            if url.lower().endswith('.xml'):
+                self._process_sitemap_url(url)
+            elif self.scraper.url_validator.is_root_domain(url):
                 self._process_sitemap(url)
             else:
                 self._process_single_url(url)
@@ -98,6 +104,15 @@ class DomainWorker(threading.Thread):
             print(f"[{self.name}] No sitemap found for {url}")
             return
         
+        self._scrape_and_save_sitemap(sitemap_url)
+
+    def _process_sitemap_url(self, sitemap_url: str):
+        """Process a direct sitemap URL."""
+        print(f"[{self.name}] Processing direct sitemap: {sitemap_url}")
+        self._scrape_and_save_sitemap(sitemap_url)
+
+    def _scrape_and_save_sitemap(self, sitemap_url: str):
+        """Common logic to scrape articles from a sitemap URL."""
         articles = self.scraper.scrape_from_sitemap(
             sitemap_url=sitemap_url,
             max_articles=self.max_articles,
