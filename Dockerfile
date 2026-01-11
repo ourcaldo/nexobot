@@ -4,6 +4,9 @@
 
 FROM python:3.11-slim
 
+# Prevent Python from buffering stdout/stderr (fixes missing docker logs)
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Install dependencies
